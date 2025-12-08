@@ -8,3 +8,4 @@ alembic
 jinja2
 httpx
 pydantic-settings
+pydantic-settings
