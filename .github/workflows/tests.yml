@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TESTING: true
+      IN_DOCKER: false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -17,6 +20,5 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt
       - run: pip install pytest httpx
-      - run: echo "TESTING=true" >> $GITHUB_ENV
       - run: echo "GOOGLE_API_KEY=fake" > .env
       - run: pytest -q
