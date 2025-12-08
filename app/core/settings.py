@@ -1,16 +1,11 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    GOOGLE_API_KEY: str = ""
+    GOOGLE_API_KEY: str = "NO_KEY"  # Valor por defecto para CI
     TESTING: bool = False
-    DB_URL: str = "sqlite:///:memory:"  # Default para CI y tests
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-    )
+    DB_URL: str = "sqlite:///:memory:"  # DB en memoria para CI
 
 
 @lru_cache()
