@@ -1,17 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Header
-from app.core.oracle import ask
+from fastapi import APIRouter, Header, HTTPException, status
+from pydantic import BaseModel
+from app.core.settings import settings
+from app.core.ai import ask_google
 
 router = APIRouter()
 
-async def require_key(x_api_key: str | None = Header(default=None)):
-    expected = "fake"  # CI uses fake, override in prod with real env var
-    if x_api_key != expected:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized"
-        )
+class AskPayload(BaseModel):
+    question: str
 
 @router.post("/ask")
-async def ask_route(data: dict, _auth=Depends(require_key)):
-    question = data.get("question", "")
-    return {"answer": await ask(question)}
+async def ask_endpoint(payload: AskPayload, authorization: str = Header(None)):
+    if authorization != f"Bearer {settings.GOOGLE_API_KEY}":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    answer = await ask_google(payload.question)
+    return {"answer": answer}
