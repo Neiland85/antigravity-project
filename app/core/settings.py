@@ -1,10 +1,12 @@
+from pydantic import BaseSettings
 import os
 
-# Si estamos en CI/testing, no queremos usar disco
-TESTING = os.getenv("TESTING") == "true"
+class Settings(BaseSettings):
+    GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "fake")
 
-DB_URL = (
-    "sqlite:///:memory:"
-    if TESTING
-    else "sqlite:///data/antigravity.db"
-)
+    class Config:
+        env_file = ".env"
+        extra = "ignore"
+
+
+settings = Settings()
