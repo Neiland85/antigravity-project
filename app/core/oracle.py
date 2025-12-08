@@ -1,6 +1,8 @@
 import google.generativeai as genai
-from storage import SessionLocal, Question
 from sqlalchemy.exc import SQLAlchemyError
+
+from app.infrastructure.storage import Question, SessionLocal
+
 
 def ask(question: str) -> str:
     db = SessionLocal()
