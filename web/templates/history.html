@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>📚 Historial Antigravitacional</title>
+  <style>
+    body { background:#111; color:#0f0; font-family:monospace; max-width:900px; margin:auto; }
+    a { color:#0f0; }
+    pre { white-space:pre-wrap; }
+    .item { border-left:3px solid #0f0; padding:10px; margin-bottom:15px; background:#000; }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Archivo del Caos</h1>
+  <a href="/">← Volver al Oráculo</a>
+
+  {% for r in records %}
+  <div class="item">
+    <b>Pregunta:</b> {{ r.question }}<br>
+    <b>Respuesta:</b><br>
+    <pre>{{ r.answer }}</pre>
+  </div>
+  {% else %}
+    <p>La memoria del universo está vacía… por ahora.</p>
+  {% endfor %}
+
+</body>
+</html>

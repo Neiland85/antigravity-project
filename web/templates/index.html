@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Oráculo Antigravitacional</title>
+  <style>
+    body {
+      font-family: monospace;
+      max-width: 1000px;
+      margin: auto;
+      background: #050505;
+      color: #0f0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #7fffd4;
+      margin-bottom: 20px;
+    }
+    input, button {
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .box {
+      margin-top: 10px;
+      padding: 10px;
+      border-left: 3px solid #0f0;
+      background: #000;
+      max-height: 60vh;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    #godel-canvas {
+      width: 100%;
+      height: 350px;
+      border: 1px solid #0f0;
+      background: #000;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+    }
+    .hint {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚀 Oráculo Antigravitacional UI</h1>
+  <div class="subtitle">
+    Gödel, entropía y microservicios flotando en un mismo sistema no consistente.
+  </div>
+
+  <form action="/ask" method="POST">
+    <input name="question" placeholder="Lanza tu pregunta al vacío lógico..." required>
+    <button type="submit">Invocar al Oráculo</button>
+    <div class="hint">
+      Prueba cosas como: "¿Puede un bounded context demostrar su propia consistencia sin violar a Gödel?"
+    </div>
+  </form>
+
+  <div class="layout">
+    <div>
+      <h3>🧠 Respuestas</h3>
+      {% for msg in messages %}
+      <div class="box">
+        <b>Pregunta:</b> {{ msg.question }}<br>
+        <b>Origen:</b> {{ msg.source }}<br><br>
+        <b>Respuesta:</b><br>
+        {{ msg.answer }}
+      </div>
+      {% endfor %}
+      {% if not messages %}
+      <div class="box">
+        Sin preguntas todavía. El sistema es consistente… por ahora.
+      </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h3>♾️ Campo Antigravitacional de Gödel</h3>
+      <canvas id="godel-canvas"></canvas>
+      <div class="hint">
+        Las ecuaciones flotan en 3D falso, igual que la confianza en los sistemas distribuidos.
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/antigravity.js"></script>
+</body>
+</html>
