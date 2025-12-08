@@ -11,8 +11,8 @@ from app.api.v1.routes import router as api_router
 app = FastAPI(title="Oráculo Antigravitacional")
 
 # Static + templates
-app.mount("/static", StaticFiles(directory="web/static"), name="static")
-templates = Jinja2Templates(directory="web/templates")
+app.mount("/static", StaticFiles(directory="/app/web/static"), name="static")
+templates = Jinja2Templates(directory="/app/web/templates")
 
 app.include_router(api_router, prefix="/api/v1", tags=["antigravity"])
 
