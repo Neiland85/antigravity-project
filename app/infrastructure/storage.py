@@ -1,19 +1,16 @@
-from sqlalchemy import create_engine, Column, Integer, Text, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker
-from datetime import datetime
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base
+from app.core.settings import DB_URL
 
-DB_URL = "sqlite:///antigravity.db"
 engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
-
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True, index=True)
-    question = Column(Text, unique=True)
-    answer = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    text = Column(String, index=True)
+    answer = Column(String)
 
+# Always ensure DB and tables exist
 Base.metadata.create_all(bind=engine)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
