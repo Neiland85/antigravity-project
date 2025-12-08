@@ -1,25 +1,10 @@
-from pydantic_settings import BaseSettings
-from functools import lru_cache
-import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    GOOGLE_API_KEY: str = "test_mode_key"
-    DB_URL: str = "sqlite:///./data/oracle.db"
+    model_config = SettingsConfigDict(extra="ignore")
 
-    class Config:
-        env_file = ".env"
+    GOOGLE_API_KEY: str = "fake"
+    TESTING: bool = False
+    IN_DOCKER: bool = False
 
-
-@lru_cache
-def get_settings() -> Settings:
-    # En test: fuerzo config dummy y DB in-memory
-    if os.getenv("TESTING") == "true":
-        return Settings(
-            GOOGLE_API_KEY="test_key",
-            DB_URL="sqlite:///:memory:"
-        )
-    return Settings()
-
-
-settings = get_settings()
-
+settings = Settings()
