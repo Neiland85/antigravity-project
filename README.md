@@ -56,6 +56,17 @@ docker-compose up --build
 -   **API Documentation**: `http://localhost:80/docs`
 -   **Sentinel Health**: `http://localhost:9000/health`
 
+## 🛠️ Levantamiento Integrado (Modo Desarrollo)
+
+Si quieres trabajar en local sin Docker, puedes levantar todo el ecosistema con un solo comando:
+
+```bash
+cd antigravity-project
+python run_dev.py
+```
+
+Este script detecta automáticamente las rutas y levanta **Sentinel (9000)**, **Oracle (8080)** y el **Frontend (8000)** en paralelo.
+
 ## 🛠️ Tech Stack
 
 -   **Runtime**: Python 3.14 (Bleeding Edge)
