@@ -1,8 +1,3 @@
-
-import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,11 +6,24 @@ class RetroactiveIntuition:
     _instance = None
     
     def __init__(self):
-        self.vectorizer = TfidfVectorizer(max_features=500)
-        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        try:
+            import numpy as np
+            import pandas as pd
+            from sklearn.ensemble import RandomForestClassifier
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            self.vectorizer = TfidfVectorizer(max_features=500)
+            self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+            self._available = True
+        except ImportError:
+            logger.warning("Retroactive dependencies (pandas/sklearn) not found. Disabling analysis node.")
+            self._available = False
+            return
+
         self._train_initial_intuition()
 
     def _train_initial_intuition(self):
+        if not self._available: return
+        import pandas as pd
         # Synthetic data: [Text, Intuition Category]
         # 0: Low complexity, 1: Logical Paradox, 2: Scientific Sarcasm
         data = [
@@ -34,7 +42,10 @@ class RetroactiveIntuition:
         logger.info('Retroactive Random Forest node initialized.')
 
     def analyze(self, text):
+        if not self._available:
+            return {'category': 'Desactivado (Lite Mode)', 'confidence': 0.0}
         try:
+            import numpy as np
             X = self.vectorizer.transform([text])
             prediction = self.model.predict(X)[0]
             probs = self.model.predict_proba(X)[0]

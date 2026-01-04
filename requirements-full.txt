@@ -5,6 +5,13 @@ google-generativeai
 python-multipart
 sqlalchemy
 psycopg2-binary
+alembic
 jinja2
 httpx
 pydantic-settings
+transformers
+torch
+accelerate
+sentencepiece
+scikit-learn
+pandas

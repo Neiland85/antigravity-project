@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import json, os, logging
+import json, os, logging, random
 from sqlalchemy import func
 
 from app.infrastructure.storage import SessionLocal, Question
@@ -32,7 +32,12 @@ def save_cache():
     except Exception as e:
         logging.error(f"Error saving cache: {e}")
 
+from app.infrastructure.storage import SessionLocal, Question, init_db
 load_cache()
+try:
+    init_db()
+except Exception as e:
+    logging.error(f"Error initializing DB: {e}")
 
 app = FastAPI()
 import app.middleware.ratelimit as rl
@@ -67,10 +72,8 @@ async def ask(request: Request, question: str = Form(...)):
         answer = CACHE[key]
         source = "⚡ Caché"
     else:
-        from app.core.settings import settings
-        
+
         if settings.MOCK_AI:
-            import random
             mock_responses = [
                 "Según mis cálculos de la constante cosmológica, sí, pero solo los martes.",
                 "La interferencia cuántica sugiere que el resultado es indeterminado hasta que lo observes.",
@@ -92,9 +95,9 @@ async def ask(request: Request, question: str = Form(...)):
             except Exception as e:
                 logging.error(f"Error saving to DB (Mock): {e}")
         else:
+            history_context = ""
             try:
                 # 1. Recuperar contexto (Historia reciente)
-                history_context = ""
                 try:
                     db = SessionLocal()
                     last_interactions = db.query(Question).order_by(Question.id.desc()).limit(5).all()
@@ -150,7 +153,6 @@ async def ask(request: Request, question: str = Form(...)):
                     logging.error(f"Error saving to DB: {e}")
 
             except Exception as e:
-                import logging
                 logging.error(f"Error en Gemini API: {e}")
                 
                 try:
@@ -158,7 +160,6 @@ async def ask(request: Request, question: str = Form(...)):
                     answer = reason_locally(question, context=history_context)
                     source = "🎛️ Local Transformers Node"
                 except Exception as le:
-                    import random
                     logging.error(f"Error en Local Reasoning: {le}")
                     fallbacks = [
                         "La entropía local es demasiado alta para procesar tu pregunta. Intenta reducir el desorden de tu habitación primero.",
@@ -177,7 +178,6 @@ async def ask(request: Request, question: str = Form(...)):
         analysis_text = f"\n\n[Retro-Análisis: {analysis['category']} (Confiabilidad: {int(analysis['confidence'] * 100)}%)]"
         answer += analysis_text
     except Exception as re:
-        import logging
         logging.error(f"Error en Retro-Analisis: {re}")
 
     return templates.TemplateResponse(
@@ -209,7 +209,6 @@ async def random_answer(request: Request):
         {"request": request, "records": [record] if record else []}
     )
 
-import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"

@@ -15,11 +15,25 @@ spec:
     spec:
       containers:
       - name: sentinel
-        image: antigravity-project-sentinel:latest # Assuming local build
+        image: antigravity-project-sentinel:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 9000
+          name: http-sentinel
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
         livenessProbe:
+          httpGet:
+            path: /health
+            port: 9000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
           httpGet:
             path: /health
             port: 9000

@@ -19,6 +19,26 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
+          name: http-oracle
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
         env:
         - name: SENTINEL_URL
           value: "http://sentinel.antigravity.svc.cluster.local:80/validate"

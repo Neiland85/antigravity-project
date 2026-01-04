@@ -1,0 +1,27 @@
+{
+	"version": 2,
+	"builds": [
+		{
+			"src": "web/main_web.py",
+			"use": "@vercel/python",
+			"config": {
+				"maxDuration": 25
+			}
+		}
+	],
+	"routes": [
+		{
+			"src": "/static/(.*)",
+			"dest": "/web/static/$1"
+		},
+		{
+			"src": "/(.*)",
+			"dest": "web/main_web.py"
+		}
+	],
+	"env": {
+		"DB_URL": "sqlite:////tmp/antigravity.db",
+		"MOCK_AI": "True",
+		"PYTHONPATH": "."
+	}
+}
