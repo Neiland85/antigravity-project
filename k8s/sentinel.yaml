@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinel
+  namespace: antigravity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinel
+  template:
+    metadata:
+      labels:
+        app: sentinel
+    spec:
+      containers:
+      - name: sentinel
+        image: antigravity-project-sentinel:latest # Assuming local build
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinel
+  namespace: antigravity
+spec:
+  selector:
+    app: sentinel
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9000

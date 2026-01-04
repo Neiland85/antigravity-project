@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     TESTING: bool = False
     IN_DOCKER: bool = False
     MOCK_AI: bool = False
+    
+    # Internal Service URLs
+    SENTINEL_URL: str = Field(default="http://sentinel:9000", alias="SENTINEL_URL")
+    BACKEND_URL: str = Field(default="http://oracle:8080", alias="BACKEND_URL")
+    
     DB_URL: str = "sqlite:///./data/antigravity.db"
 
 settings = Settings()

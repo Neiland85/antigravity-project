@@ -16,8 +16,8 @@ class Question(Base):
     __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True, index=True)
-    question_text = Column(String, index=True)
-    answer_text = Column(String, index=True)
+    question = Column(String, index=True)
+    answer = Column(String, index=True)
 
 
 def init_db():

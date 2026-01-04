@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oracle
+  namespace: antigravity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle
+  template:
+    metadata:
+      labels:
+        app: oracle
+    spec:
+      containers:
+      - name: oracle
+        image: antigravity-project-oracle:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SENTINEL_URL
+          value: "http://sentinel.antigravity.svc.cluster.local:80/validate"
+        - name: ANTIGRAVITY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: antigravity-secrets
+              key: api-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle
+  namespace: antigravity
+spec:
+  selector:
+    app: oracle
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

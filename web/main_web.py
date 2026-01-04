@@ -1,10 +1,16 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import json, os
-from dotenv import load_dotenv
-import google.generativeai as genai
+from fastapi.staticfiles import StaticFiles
+import json, os, logging
 from sqlalchemy import func
+
+from app.infrastructure.storage import SessionLocal, Question
+from app.core.settings import settings
+import google.generativeai as genai
+
+# Setup genai from settings
+genai.configure(api_key=settings.GOOGLE_API_KEY)
 
 CACHE_FILE = "oracle_cache.json"
 CACHE = {}
@@ -12,24 +18,26 @@ CACHE = {}
 def load_cache():
     global CACHE
     try:
-        with open(CACHE_FILE, "r") as f:
-            CACHE = json.load(f)
-    except:
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, "r") as f:
+                CACHE = json.load(f)
+    except Exception as e:
+        logging.error(f"Error loading cache: {e}")
         CACHE = {}
 
 def save_cache():
-    with open(CACHE_FILE, "w") as f:
-        json.dump(CACHE, f, indent=2)
-
-load_dotenv()
-api_key = os.getenv("ANTIGRAVITY_API_KEY")
-genai.configure(api_key=api_key)
+    try:
+        with open(CACHE_FILE, "w") as f:
+            json.dump(CACHE, f, indent=2)
+    except Exception as e:
+        logging.error(f"Error saving cache: {e}")
 
 load_cache()
 
-from fastapi.staticfiles import StaticFiles
+app = FastAPI()
+import app.middleware.ratelimit as rl
+app.middleware('http')(rl.rate_limit)
 
-app = FastAPI(); import app.middleware.ratelimit as rl; app.middleware('http')(rl.rate_limit)
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
 templates = Jinja2Templates(directory="web/templates")
 
@@ -41,17 +49,16 @@ async def home(request: Request):
 async def ask(request: Request, question: str = Form(...)):
     # --- SENTINEL SECURITY CHECK ---
     import httpx
-    SENTINEL_URL = os.getenv("SENTINEL_URL", "http://sentinel:9000/validate")
     try:
         async with httpx.AsyncClient() as client:
-            resp = await client.post(SENTINEL_URL, json={"question": question}, timeout=2.0)
+            resp = await client.post(f"{settings.SENTINEL_URL}/validate", json={"question": question}, timeout=2.0)
             if resp.status_code == 403:
                 return templates.TemplateResponse("index.html", {
                     "request": request,
                     "messages": [{"question": question, "answer": "🛡️ SEGURIDAD: Petición bloqueada por Sentinel (Patrón no autorizado).", "source": "👮 Sentinel"}]
                 })
     except Exception as e:
-        print(f"Sentinel connection skipped: {e}")
+        logging.warning(f"Sentinel connection skipped: {e}")
     # -------------------------------
 
     key = question.lower().strip()
@@ -79,7 +86,7 @@ async def ask(request: Request, question: str = Form(...)):
             # Guardar en DB (también en Mock para persistencia)
             try:
                 db = SessionLocal()
-                db.add(Question(question_text=question, answer_text=answer))
+                db.add(Question(question=question, answer=answer))
                 db.commit()
                 db.close()
             except Exception as e:
@@ -94,7 +101,7 @@ async def ask(request: Request, question: str = Form(...)):
                     db.close()
                     # Revertir para orden cronológico
                     for interaction in reversed(last_interactions):
-                        history_context += f"User: {interaction.question_text}\nAI: {interaction.answer_text}\n"
+                        history_context += f"User: {interaction.question}\nAI: {interaction.answer}\n"
                 except Exception as ex:
                     logging.error(f"Error recuperando historial: {ex}")
                 
@@ -136,7 +143,7 @@ async def ask(request: Request, question: str = Form(...)):
                 # Guardar en DB History
                 try:
                     db = SessionLocal()
-                    db.add(Question(question_text=question, answer_text=answer))
+                    db.add(Question(question=question, answer=answer))
                     db.commit()
                     db.close()
                 except Exception as e:
@@ -181,7 +188,6 @@ async def ask(request: Request, question: str = Form(...)):
         }
     )
 
-from app.infrastructure.storage import SessionLocal, Question
 
 @app.get("/history", response_class=HTMLResponse)
 async def history(request: Request):
