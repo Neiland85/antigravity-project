@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     )
 
     GOOGLE_API_KEY: str = Field(default="fake", alias="ANTIGRAVITY_API_KEY")
+    GRAVITY_TOKEN: str = Field(default="zero-gravity-default-token", alias="GRAVITY_TOKEN")
     TESTING: bool = False
     IN_DOCKER: bool = False
     MOCK_AI: bool = False

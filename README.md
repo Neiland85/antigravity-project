@@ -14,7 +14,7 @@
 
 ---
 
-[Explore Docs](/docs) • [View Architecture](#-architecture) • [Getting Started](#-getting-started) • [Security](#-sentinel-security)
+[Explore Docs](docs/infrastructure_ideas.md) • [Biometría](docs/biometrics_integration.md) • [View Architecture](#-architecture) • [Getting Started](#-getting-started) • [Security](#-sentinel-security)
 
 </div>
 
