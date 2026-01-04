@@ -1,23 +1,24 @@
-from fastapi import Request, HTTPException
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from time import time
 
 # 5 peticiones por 10 segundos
-MAX_REQ = 5
+MAX_REQ = 50
 WINDOW = 10
 requests_per_user = {}
 
 async def rate_limit(request: Request, call_next):
-    token = request.headers.get("Authorization", "")
+    client_ip = request.client.host if request.client else "unknown"
     now = time()
 
-    if token not in requests_per_user:
-        requests_per_user[token] = []
+    if client_ip not in requests_per_user:
+        requests_per_user[client_ip] = []
 
     # limpiar la ventana
-    requests_per_user[token] = [t for t in requests_per_user[token] if now - t < WINDOW]
+    requests_per_user[client_ip] = [t for t in requests_per_user[client_ip] if now - t < WINDOW]
 
-    if len(requests_per_user[token]) >= MAX_REQ:
-        raise HTTPException(status_code=429, detail="Demasiada curiosidad cósmica")
+    if len(requests_per_user[client_ip]) >= MAX_REQ:
+        return JSONResponse(status_code=429, content={"detail": "Demasiada curiosidad cósmica"})
 
-    requests_per_user[token].append(now)
+    requests_per_user[client_ip].append(now)
     return await call_next(request)

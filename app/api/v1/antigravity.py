@@ -1,17 +1,13 @@
-from fastapi import APIRouter, HTTPException, Header
-from app.core.ai import ask_google_structured
+from fastapi import APIRouter, Header, HTTPException
 from app.core.settings import settings
+from app.core.ai import ask_google
 
 router = APIRouter()
 
-@router.post("")
-async def antigravity_api(payload: dict, authorization: str = Header(None)):
+@router.post("/antigravity")
+async def antigravity(question: str, authorization: str = Header(None)):
     if authorization != f"Bearer {settings.GOOGLE_API_KEY}":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    question = payload.get("question")
-    if not question:
-        raise HTTPException(status_code=400, detail="Missing 'question'")
-
-    response = await ask_google_structured(question)
-    return response.model_dump()
+    answer = await ask_google(question)
+    return {"answer": answer, "lift": "upward", "gravity": "ignored"}

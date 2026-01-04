@@ -2,8 +2,9 @@
 __pycache__/
 data/
 *.db
-*.sqlite
-*.sqlite3
+*.pre-commit-config.yaml
+*.db
+*.jsonite3
 .venv/
 .DS_Store
 .env
