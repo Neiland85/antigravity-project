@@ -8,7 +8,7 @@ client = TestClient(app)
 def test_home():
     res = client.get("/")
     assert res.status_code == 200
-    assert "El Oráculo" in res.text
+    assert "Backend API" in res.text
 
 
 def test_api_unauthorized():
