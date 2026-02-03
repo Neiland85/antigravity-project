@@ -1,0 +1,2 @@
+class DecideResponse:
+    pass

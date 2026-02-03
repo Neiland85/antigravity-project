@@ -1,0 +1,2 @@
+class IntentPolicy:
+    pass

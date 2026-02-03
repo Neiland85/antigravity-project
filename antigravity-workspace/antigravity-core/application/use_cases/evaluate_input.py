@@ -1,0 +1,2 @@
+class EvaluateInput:
+    pass

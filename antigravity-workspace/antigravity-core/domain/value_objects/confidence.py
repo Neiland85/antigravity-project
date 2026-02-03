@@ -1,0 +1,2 @@
+class Confidence:
+    pass

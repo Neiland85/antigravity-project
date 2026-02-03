@@ -1,0 +1,13 @@
+{
+  "folders": [
+    { "path": "antigravity-core" },
+    { "path": "antigravity-api" },
+    { "path": "antigravity-sentinel" },
+    { "path": "antigravity-web" },
+    { "path": "docs" },
+    { "path": "tools" }
+  ],
+  "settings": {
+    "python.analysis.typeCheckingMode": "strict"
+  }
+}
